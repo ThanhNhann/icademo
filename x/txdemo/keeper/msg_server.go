@@ -1,7 +1,10 @@
 package keeper
 
 import (
+	"context"
+
 	"github.com/ThanhNhann/icademo/x/txdemo/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type msgServer struct {
@@ -15,3 +18,14 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 }
 
 var _ types.MsgServer = msgServer{}
+
+func (k msgServer) RegisterAccount(goCtx context.Context, msg *types.MsgRegisterAccount) (*types.MsgRegisterAccountResponse, error) {
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if err := k.icaControllerKeeper.RegisterInterchainAccount(ctx, msg.ConnectionId, msg.Owner, msg.Version); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgRegisterAccountResponse{}, nil
+}

@@ -3,5 +3,24 @@ package icademo.txdemo;
 
 option go_package = "github.com/ThanhNhann/icademo/x/txdemo/types";
 
+import "gogoproto/gogo.proto";
+
 // Msg defines the Msg service.
-service Msg {}
+service Msg {
+    // RegisterAccount defines a rpc handler for MsgRegisterAccount
+    rpc RegisterAccount(MsgRegisterAccount) returns (MsgRegisterAccountResponse);
+}
+
+
+// MsgRegisterAccount defines the payload for Msg/RegisterAccount
+message MsgRegisterAccount {
+    option (gogoproto.equal)           = false;
+    option (gogoproto.goproto_getters) = false;
+  
+    string owner         = 1;
+    string connection_id = 2 [(gogoproto.moretags) = "yaml:\"connection_id\""];
+    string version       = 3;
+}
+
+// MsgRegisterAccountResponse defines the response for Msg/RegisterAccount
+message MsgRegisterAccountResponse {}
