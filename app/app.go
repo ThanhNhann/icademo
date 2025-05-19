@@ -90,6 +90,7 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	ica "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts"
+	icacontroller "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/controller"
 	icacontrollerkeeper "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/controller/keeper"
 	icacontrollertypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/controller/types"
 	icahost "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host"
@@ -109,10 +110,12 @@ import (
 	solomachine "github.com/cosmos/ibc-go/v7/modules/light-clients/06-solomachine"
 	ibctm "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint"
 	"github.com/spf13/cast"
+	ibctestingtypes "github.com/cosmos/ibc-go/v7/testing/types"
 
 	txdemomodule "icademo/x/txdemo"
 	txdemomodulekeeper "icademo/x/txdemo/keeper"
 	txdemomoduletypes "icademo/x/txdemo/types"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "icademo/app/params"
@@ -239,6 +242,7 @@ type App struct {
 	IBCKeeper             *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	EvidenceKeeper        evidencekeeper.Keeper
 	TransferKeeper        ibctransferkeeper.Keeper
+	ICAControllerKeeper   icacontrollerkeeper.Keeper
 	ICAHostKeeper         icahostkeeper.Keeper
 	FeeGrantKeeper        feegrantkeeper.Keeper
 	GroupKeeper           groupkeeper.Keeper
@@ -248,6 +252,7 @@ type App struct {
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
+	ScopedICAControllerKeeper capabilitykeeper.ScopedKeeper
 
 	ScopedTxdemoKeeper capabilitykeeper.ScopedKeeper
 	TxdemoKeeper       txdemomodulekeeper.Keeper
@@ -338,6 +343,7 @@ func New(
 	scopedICAControllerKeeper := app.CapabilityKeeper.ScopeToModule(icacontrollertypes.SubModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 	scopedICAHostKeeper := app.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
+	scopedTxdemoKeeper := app.CapabilityKeeper.ScopeToModule(txdemomoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/scopedKeeper
 
 	// add keepers
@@ -464,6 +470,13 @@ func New(
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
 	transferIBCModule := transfer.NewIBCModule(app.TransferKeeper)
 
+	app.ICAControllerKeeper = icacontrollerkeeper.NewKeeper(
+		appCodec, keys[icacontrollertypes.StoreKey], app.GetSubspace(icacontrollertypes.SubModuleName),
+		app.IBCKeeper.ChannelKeeper, // may be replaced with middleware such as ics29 fee
+		app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
+		scopedICAControllerKeeper, app.MsgServiceRouter(),
+	)
+
 	app.ICAHostKeeper = icahostkeeper.NewKeeper(
 		appCodec, keys[icahosttypes.StoreKey],
 		app.GetSubspace(icahosttypes.SubModuleName),
@@ -474,16 +487,25 @@ func New(
 		scopedICAHostKeeper,
 		app.MsgServiceRouter(),
 	)
-	icaControllerKeeper := icacontrollerkeeper.NewKeeper(
-		appCodec, keys[icacontrollertypes.StoreKey],
-		app.GetSubspace(icacontrollertypes.SubModuleName),
-		app.IBCKeeper.ChannelKeeper, // may be replaced with middleware such as ics29 fee
-		app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
-		scopedICAControllerKeeper, app.MsgServiceRouter(),
-	)
-	icaModule := ica.NewAppModule(&icaControllerKeeper, &app.ICAHostKeeper)
-	icaHostIBCModule := icahost.NewIBCModule(app.ICAHostKeeper)
 
+	app.TxdemoKeeper = *txdemomodulekeeper.NewKeeper(
+		appCodec,
+		keys[txdemomoduletypes.StoreKey],
+		keys[txdemomoduletypes.MemStoreKey],
+		app.GetSubspace(txdemomoduletypes.ModuleName),
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		scopedTxdemoKeeper,
+		app.ICAControllerKeeper,
+	)
+
+	txdemoModule := txdemomodule.NewAppModule(appCodec, app.TxdemoKeeper, app.AccountKeeper, app.BankKeeper)
+	txdemoIBCModule := txdemomodule.NewIBCModule(app.TxdemoKeeper)
+
+	icaModule := ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper)
+
+	icaControllerIBCModule := icacontroller.NewIBCMiddleware(txdemoIBCModule, app.ICAControllerKeeper)
+	icaHostIBCModule := icahost.NewIBCModule(app.ICAHostKeeper)	
 	// Create evidence Keeper for to register the IBC light client misbehaviour evidence route
 	evidenceKeeper := evidencekeeper.NewKeeper(
 		appCodec,
@@ -520,20 +542,6 @@ func New(
 		),
 	)
 
-	scopedTxdemoKeeper := app.CapabilityKeeper.ScopeToModule(txdemomoduletypes.ModuleName)
-	app.ScopedTxdemoKeeper = scopedTxdemoKeeper
-	app.TxdemoKeeper = *txdemomodulekeeper.NewKeeper(
-		appCodec,
-		keys[txdemomoduletypes.StoreKey],
-		keys[txdemomoduletypes.MemStoreKey],
-		app.GetSubspace(txdemomoduletypes.ModuleName),
-		app.IBCKeeper.ChannelKeeper,
-		&app.IBCKeeper.PortKeeper,
-		scopedTxdemoKeeper,
-	)
-	txdemoModule := txdemomodule.NewAppModule(appCodec, app.TxdemoKeeper, app.AccountKeeper, app.BankKeeper)
-
-	txdemoIBCModule := txdemomodule.NewIBCModule(app.TxdemoKeeper)
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	/**** IBC Routing ****/
@@ -543,9 +551,11 @@ func New(
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()
-	ibcRouter.AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
+	ibcRouter.
+		AddRoute(txdemomoduletypes.ModuleName, icaControllerIBCModule).
+		AddRoute(icacontrollertypes.SubModuleName, icaControllerIBCModule).
+		AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
 		AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
-	ibcRouter.AddRoute(txdemomoduletypes.ModuleName, txdemoIBCModule)
 	// this line is used by starport scaffolding # ibc/app/router
 	app.IBCKeeper.SetRouter(ibcRouter)
 
@@ -745,6 +755,9 @@ func New(
 
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
+	app.ScopedICAControllerKeeper = scopedICAControllerKeeper
+	app.ScopedICAHostKeeper = scopedICAHostKeeper
+	app.ScopedTxdemoKeeper = scopedTxdemoKeeper
 	// this line is used by starport scaffolding # stargate/app/beforeInitReturn
 
 	return app
@@ -926,3 +939,38 @@ func (app *App) SimulationManager() *module.SimulationManager {
 func (app *App) ModuleManager() *module.Manager {
 	return app.mm
 }
+
+// TestingApp functions
+
+// GetBaseApp implements the TestingApp interface.
+func (app *App) GetBaseApp() *baseapp.BaseApp {
+	return app.BaseApp
+}
+
+// GetStakingKeeper implements the TestingApp interface.
+func (app *App) GetStakingKeeper() ibctestingtypes.StakingKeeper {
+	return app.StakingKeeper
+}
+
+// GetIBCKeeper implements the TestingApp interface.
+func (app *App) GetIBCKeeper() *ibckeeper.Keeper {
+	return app.IBCKeeper
+}
+
+// GetScopedIBCKeeper implements the TestingApp interface.
+func (app *App) GetScopedIBCKeeper() capabilitykeeper.ScopedKeeper {
+	return app.ScopedIBCKeeper
+}
+
+// TxConfig returns SimApp's TxConfig
+func (app *App) GetTxConfig() client.TxConfig {
+	return app.txConfig
+}
+
+// EmptyAppOptions is a stub implementing AppOptions
+type EmptyAppOptions struct{}
+
+func (EmptyAppOptions) Get(key string) interface{} {
+	return nil
+}
+

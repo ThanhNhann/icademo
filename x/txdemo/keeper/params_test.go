@@ -1,18 +1,15 @@
 package keeper_test
 
 import (
-	"testing"
-
-	"github.com/stretchr/testify/require"
-	testkeeper "icademo/testutil/keeper"
 	"icademo/x/txdemo/types"
 )
 
-func TestGetParams(t *testing.T) {
-	k, ctx := testkeeper.TxdemoKeeper(t)
+func (suite *KeeperTestSuite) TestGetParams() {
+	k := GetICAApp(suite.chainA).TxdemoKeeper
+	ctx := suite.chainA.GetContext()
 	params := types.DefaultParams()
 
 	k.SetParams(ctx, params)
 
-	require.EqualValues(t, params, k.GetParams(ctx))
+	suite.Require().EqualValues(params, k.GetParams(ctx))
 }

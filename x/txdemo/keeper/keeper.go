@@ -10,6 +10,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	icacontrollerkeeper "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/controller/keeper"
 	channeltypes "github.com/cosmos/ibc-go/v7/modules/core/04-channel/types"
 	host "github.com/cosmos/ibc-go/v7/modules/core/24-host"
 	"github.com/cosmos/ibc-go/v7/modules/core/exported"
@@ -24,9 +25,10 @@ type (
 		memKey     storetypes.StoreKey
 		paramstore paramtypes.Subspace
 
-		channelKeeper types.ChannelKeeper
-		portKeeper    types.PortKeeper
-		scopedKeeper  exported.ScopedKeeper
+		channelKeeper       types.ChannelKeeper
+		portKeeper          types.PortKeeper
+		scopedKeeper        exported.ScopedKeeper
+		icaControllerKeeper icacontrollerkeeper.Keeper
 	}
 )
 
@@ -38,6 +40,7 @@ func NewKeeper(
 	channelKeeper types.ChannelKeeper,
 	portKeeper types.PortKeeper,
 	scopedKeeper exported.ScopedKeeper,
+	icaControllerKeeper icacontrollerkeeper.Keeper,
 
 ) *Keeper {
 	// set KeyTable if it has not already been set
@@ -51,9 +54,10 @@ func NewKeeper(
 		memKey:     memKey,
 		paramstore: ps,
 
-		channelKeeper: channelKeeper,
-		portKeeper:    portKeeper,
-		scopedKeeper:  scopedKeeper,
+		channelKeeper:       channelKeeper,
+		portKeeper:          portKeeper,
+		scopedKeeper:        scopedKeeper,
+		icaControllerKeeper: icaControllerKeeper,
 	}
 }
 

@@ -1,21 +1,20 @@
 package keeper_test
 
 import (
-	"testing"
+	"icademo/x/txdemo/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
-	testkeeper "icademo/testutil/keeper"
-	"icademo/x/txdemo/types"
 )
 
-func TestParamsQuery(t *testing.T) {
-	keeper, ctx := testkeeper.TxdemoKeeper(t)
+func (suite *KeeperTestSuite) TestParamsQuery() {
+	k := GetICAApp(suite.chainA).TxdemoKeeper
+	ctx := suite.chainA.GetContext()
 	wctx := sdk.WrapSDKContext(ctx)
 	params := types.DefaultParams()
-	keeper.SetParams(ctx, params)
+	k.SetParams(ctx, params)
 
-	response, err := keeper.Params(wctx, &types.QueryParamsRequest{})
-	require.NoError(t, err)
-	require.Equal(t, &types.QueryParamsResponse{Params: params}, response)
+	response, err := k.Params(wctx, &types.QueryParamsRequest{})
+	require.NoError(suite.T(), err)
+	require.Equal(suite.T(), &types.QueryParamsResponse{Params: params}, response)
 }
