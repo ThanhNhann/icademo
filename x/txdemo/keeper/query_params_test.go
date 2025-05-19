@@ -1,7 +1,7 @@
 package keeper_test
 
 import (
-	"icademo/x/txdemo/types"
+	"github.com/ThanhNhann/icademo/x/txdemo/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"

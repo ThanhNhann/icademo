@@ -1,7 +1,7 @@
 package keeper_test
 
 import (
-	"icademo/x/txdemo/keeper"
+	"github.com/ThanhNhann/icademo/x/txdemo/keeper"
 )
 
 func (suite *KeeperTestSuite) TestMsgServer() {

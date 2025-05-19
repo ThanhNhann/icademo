@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"icademo/x/txdemo/types"
+	"github.com/ThanhNhann/icademo/x/txdemo/types"
 )
 
 type msgServer struct {

@@ -3,8 +3,8 @@ package types_test
 import (
 	"testing"
 
+	"github.com/ThanhNhann/icademo/x/txdemo/types"
 	"github.com/stretchr/testify/require"
-	"icademo/x/txdemo/types"
 )
 
 func TestGenesisState_Validate(t *testing.T) {

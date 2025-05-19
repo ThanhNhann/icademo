@@ -1,4 +1,4 @@
-module icademo
+module github.com/ThanhNhann/icademo
 
 go 1.19
 

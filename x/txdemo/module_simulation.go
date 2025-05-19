@@ -3,14 +3,15 @@ package txdemo
 import (
 	"math/rand"
 
+	"github.com/ThanhNhann/icademo/testutil/sample"
+
+	txdemosimulation "github.com/ThanhNhann/icademo/x/txdemo/simulation"
+	"github.com/ThanhNhann/icademo/x/txdemo/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
-	"icademo/testutil/sample"
-	txdemosimulation "icademo/x/txdemo/simulation"
-	"icademo/x/txdemo/types"
 )
 
 // avoid unused import issue

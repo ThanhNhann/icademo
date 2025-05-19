@@ -12,7 +12,7 @@ import (
 	channeltypes "github.com/cosmos/ibc-go/v7/modules/core/04-channel/types"
 	ibctesting "github.com/cosmos/ibc-go/v7/testing"
 
-	icaapp "icademo/app"
+	icaapp "github.com/ThanhNhann/icademo/app"
 )
 
 var (

@@ -1,7 +1,7 @@
 package keeper_test
 
 import (
-	"icademo/x/txdemo/types"
+	"github.com/ThanhNhann/icademo/x/txdemo/types"
 )
 
 func (suite *KeeperTestSuite) TestGetParams() {

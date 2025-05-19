@@ -1,8 +1,9 @@
 package keeper_test
 
 import (
-	"icademo/testutil/nullify"
-	"icademo/x/txdemo/types"
+	"github.com/ThanhNhann/icademo/testutil/nullify"
+
+	"github.com/ThanhNhann/icademo/x/txdemo/types"
 )
 
 func (suite *KeeperTestSuite) TestGenesis() {

@@ -3,6 +3,8 @@ package txdemo
 import (
 	"fmt"
 
+	"github.com/ThanhNhann/icademo/x/txdemo/keeper"
+	"github.com/ThanhNhann/icademo/x/txdemo/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
@@ -10,8 +12,6 @@ import (
 	porttypes "github.com/cosmos/ibc-go/v7/modules/core/05-port/types"
 	host "github.com/cosmos/ibc-go/v7/modules/core/24-host"
 	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
-	"icademo/x/txdemo/keeper"
-	"icademo/x/txdemo/types"
 )
 
 type IBCModule struct {

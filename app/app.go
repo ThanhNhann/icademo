@@ -109,17 +109,17 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
 	solomachine "github.com/cosmos/ibc-go/v7/modules/light-clients/06-solomachine"
 	ibctm "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint"
-	"github.com/spf13/cast"
 	ibctestingtypes "github.com/cosmos/ibc-go/v7/testing/types"
+	"github.com/spf13/cast"
 
-	txdemomodule "icademo/x/txdemo"
-	txdemomodulekeeper "icademo/x/txdemo/keeper"
-	txdemomoduletypes "icademo/x/txdemo/types"
+	txdemomodule "github.com/ThanhNhann/icademo/x/txdemo"
+	txdemomodulekeeper "github.com/ThanhNhann/icademo/x/txdemo/keeper"
+	txdemomoduletypes "github.com/ThanhNhann/icademo/x/txdemo/types"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
-	appparams "icademo/app/params"
-	"icademo/docs"
+	appparams "github.com/ThanhNhann/icademo/app/params"
+	"github.com/ThanhNhann/icademo/docs"
 )
 
 const (
@@ -249,9 +249,9 @@ type App struct {
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
 
 	// make scoped keepers public for test purposes
-	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
-	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
-	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
+	ScopedIBCKeeper           capabilitykeeper.ScopedKeeper
+	ScopedTransferKeeper      capabilitykeeper.ScopedKeeper
+	ScopedICAHostKeeper       capabilitykeeper.ScopedKeeper
 	ScopedICAControllerKeeper capabilitykeeper.ScopedKeeper
 
 	ScopedTxdemoKeeper capabilitykeeper.ScopedKeeper
@@ -505,7 +505,7 @@ func New(
 	icaModule := ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper)
 
 	icaControllerIBCModule := icacontroller.NewIBCMiddleware(txdemoIBCModule, app.ICAControllerKeeper)
-	icaHostIBCModule := icahost.NewIBCModule(app.ICAHostKeeper)	
+	icaHostIBCModule := icahost.NewIBCModule(app.ICAHostKeeper)
 	// Create evidence Keeper for to register the IBC light client misbehaviour evidence route
 	evidenceKeeper := evidencekeeper.NewKeeper(
 		appCodec,
@@ -973,4 +973,3 @@ type EmptyAppOptions struct{}
 func (EmptyAppOptions) Get(key string) interface{} {
 	return nil
 }
-

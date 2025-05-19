@@ -1,8 +1,8 @@
 package keeper
 
 import (
+	"github.com/ThanhNhann/icademo/x/txdemo/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"icademo/x/txdemo/types"
 )
 
 // GetParams get all parameters as types.Params

@@ -6,8 +6,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 
-	"icademo/app"
-	"icademo/cmd/icademod/cmd"
+	"github.com/ThanhNhann/icademo/app"
+	"github.com/ThanhNhann/icademo/cmd/icademod/cmd"
 )
 
 func main() {

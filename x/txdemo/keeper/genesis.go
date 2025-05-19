@@ -1,8 +1,8 @@
 package keeper
 
 import (
+	"github.com/ThanhNhann/icademo/x/txdemo/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"icademo/x/txdemo/types"
 )
 
 // InitGenesis initializes the module's state from a provided genesis state.

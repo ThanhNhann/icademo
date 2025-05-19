@@ -3,7 +3,7 @@ package icademo.txdemo;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "icademo/x/txdemo/types";
+option go_package = "github.com/ThanhNhann/icademo/x/txdemo/types";
 
 // Params defines the parameters for the module.
 message Params {

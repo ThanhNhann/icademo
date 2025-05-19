@@ -1,7 +1,7 @@
 syntax = "proto3";
 package icademo.txdemo;
 
-option go_package = "icademo/x/txdemo/types";
+option go_package = "github.com/ThanhNhann/icademo/x/txdemo/types";
 
 message TxdemoPacketData {
     oneof packet {
