@@ -113,34 +113,145 @@ func (m *QueryParamsResponse) GetParams() Params {
 	return Params{}
 }
 
+// QueryInterchainAccountRequest is the request type for the Query/InterchainAccountAddress RPC
+type QueryInterchainAccountRequest struct {
+	Owner        string `protobuf:"bytes,1,opt,name=owner,proto3" json:"owner,omitempty"`
+	ConnectionId string `protobuf:"bytes,2,opt,name=connection_id,json=connectionId,proto3" json:"connection_id,omitempty" yaml:"connection_id"`
+}
+
+func (m *QueryInterchainAccountRequest) Reset()         { *m = QueryInterchainAccountRequest{} }
+func (m *QueryInterchainAccountRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryInterchainAccountRequest) ProtoMessage()    {}
+func (*QueryInterchainAccountRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_6dcb30c78f0418d1, []int{2}
+}
+func (m *QueryInterchainAccountRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryInterchainAccountRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryInterchainAccountRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryInterchainAccountRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryInterchainAccountRequest.Merge(m, src)
+}
+func (m *QueryInterchainAccountRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryInterchainAccountRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryInterchainAccountRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryInterchainAccountRequest proto.InternalMessageInfo
+
+func (m *QueryInterchainAccountRequest) GetOwner() string {
+	if m != nil {
+		return m.Owner
+	}
+	return ""
+}
+
+func (m *QueryInterchainAccountRequest) GetConnectionId() string {
+	if m != nil {
+		return m.ConnectionId
+	}
+	return ""
+}
+
+// QueryInterchainAccountResponse the response type for the Query/InterchainAccountAddress RPC
+type QueryInterchainAccountResponse struct {
+	InterchainAccountAddress string `protobuf:"bytes,1,opt,name=interchain_account_address,json=interchainAccountAddress,proto3" json:"interchain_account_address,omitempty" yaml:"interchain_account_address"`
+}
+
+func (m *QueryInterchainAccountResponse) Reset()         { *m = QueryInterchainAccountResponse{} }
+func (m *QueryInterchainAccountResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryInterchainAccountResponse) ProtoMessage()    {}
+func (*QueryInterchainAccountResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_6dcb30c78f0418d1, []int{3}
+}
+func (m *QueryInterchainAccountResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryInterchainAccountResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryInterchainAccountResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryInterchainAccountResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryInterchainAccountResponse.Merge(m, src)
+}
+func (m *QueryInterchainAccountResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryInterchainAccountResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryInterchainAccountResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryInterchainAccountResponse proto.InternalMessageInfo
+
+func (m *QueryInterchainAccountResponse) GetInterchainAccountAddress() string {
+	if m != nil {
+		return m.InterchainAccountAddress
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*QueryParamsRequest)(nil), "icademo.txdemo.QueryParamsRequest")
 	proto.RegisterType((*QueryParamsResponse)(nil), "icademo.txdemo.QueryParamsResponse")
+	proto.RegisterType((*QueryInterchainAccountRequest)(nil), "icademo.txdemo.QueryInterchainAccountRequest")
+	proto.RegisterType((*QueryInterchainAccountResponse)(nil), "icademo.txdemo.QueryInterchainAccountResponse")
 }
 
 func init() { proto.RegisterFile("icademo/txdemo/query.proto", fileDescriptor_6dcb30c78f0418d1) }
 
 var fileDescriptor_6dcb30c78f0418d1 = []byte{
-	// 300 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0xca, 0x4c, 0x4e, 0x4c,
-	0x49, 0xcd, 0xcd, 0xd7, 0x2f, 0xa9, 0x00, 0x53, 0x85, 0xa5, 0xa9, 0x45, 0x95, 0x7a, 0x05, 0x45,
-	0xf9, 0x25, 0xf9, 0x42, 0x7c, 0x50, 0x39, 0x3d, 0x88, 0x9c, 0x94, 0x48, 0x7a, 0x7e, 0x7a, 0x3e,
-	0x58, 0x4a, 0x1f, 0xc4, 0x82, 0xa8, 0x92, 0x92, 0x49, 0xcf, 0xcf, 0x4f, 0xcf, 0x49, 0xd5, 0x4f,
-	0x2c, 0xc8, 0xd4, 0x4f, 0xcc, 0xcb, 0xcb, 0x2f, 0x49, 0x2c, 0xc9, 0xcc, 0xcf, 0x2b, 0x86, 0xca,
-	0x6a, 0x25, 0xe7, 0x17, 0xe7, 0xe6, 0x17, 0xeb, 0x27, 0x25, 0x16, 0xa7, 0x42, 0x0c, 0xd7, 0x2f,
-	0x33, 0x4c, 0x4a, 0x2d, 0x49, 0x34, 0xd4, 0x2f, 0x48, 0x4c, 0xcf, 0xcc, 0x03, 0x2b, 0x86, 0xaa,
-	0x95, 0x46, 0x73, 0x4b, 0x41, 0x62, 0x51, 0x62, 0x2e, 0xd4, 0x20, 0x25, 0x11, 0x2e, 0xa1, 0x40,
-	0x90, 0xf6, 0x00, 0xb0, 0x60, 0x50, 0x6a, 0x61, 0x69, 0x6a, 0x71, 0x89, 0x92, 0x37, 0x97, 0x30,
-	0x8a, 0x68, 0x71, 0x41, 0x7e, 0x5e, 0x71, 0xaa, 0x90, 0x09, 0x17, 0x1b, 0x44, 0xb3, 0x04, 0xa3,
-	0x02, 0xa3, 0x06, 0xb7, 0x91, 0x98, 0x1e, 0xaa, 0x57, 0xf4, 0x20, 0xea, 0x9d, 0x58, 0x4e, 0xdc,
-	0x93, 0x67, 0x08, 0x82, 0xaa, 0x35, 0xaa, 0xe2, 0x62, 0x05, 0x1b, 0x26, 0x54, 0xc8, 0xc5, 0x06,
-	0x51, 0x20, 0xa4, 0x84, 0xae, 0x11, 0xd3, 0x0d, 0x52, 0xca, 0x78, 0xd5, 0x40, 0x5c, 0xa4, 0x24,
-	0xd7, 0x74, 0xf9, 0xc9, 0x64, 0x26, 0x09, 0x21, 0x31, 0x7d, 0xac, 0x9e, 0x74, 0x72, 0x3b, 0xf1,
-	0x48, 0x8e, 0xf1, 0xc2, 0x23, 0x39, 0xc6, 0x07, 0x8f, 0xe4, 0x18, 0x27, 0x3c, 0x96, 0x63, 0xb8,
-	0xf0, 0x58, 0x8e, 0xe1, 0xc6, 0x63, 0x39, 0x86, 0x28, 0x9d, 0xf4, 0xcc, 0x92, 0x8c, 0xd2, 0x24,
-	0xbd, 0xe4, 0xfc, 0x5c, 0xfd, 0x90, 0x8c, 0xc4, 0xbc, 0x0c, 0xbf, 0x8c, 0xc4, 0xbc, 0x3c, 0xb8,
-	0x31, 0x15, 0x30, 0x83, 0x4a, 0x2a, 0x0b, 0x52, 0x8b, 0x93, 0xd8, 0xc0, 0xa1, 0x65, 0x0c, 0x08,
-	0x00, 0x00, 0xff, 0xff, 0xaf, 0x72, 0xb5, 0x26, 0xd8, 0x01, 0x00, 0x00,
+	// 473 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x52, 0x4f, 0x6b, 0x13, 0x41,
+	0x1c, 0xcd, 0x06, 0x1b, 0xe8, 0xf8, 0x07, 0x1c, 0x43, 0x59, 0x56, 0xdd, 0xe8, 0x88, 0x20, 0x62,
+	0x77, 0x68, 0xf5, 0x24, 0x78, 0x68, 0x40, 0xa5, 0x88, 0xa2, 0x8b, 0x27, 0x2f, 0x61, 0x32, 0x3b,
+	0xec, 0x0e, 0x74, 0xe7, 0xb7, 0xd9, 0x99, 0x68, 0x42, 0xe9, 0x45, 0xf0, 0x2e, 0xf8, 0x7d, 0x04,
+	0x6f, 0x3d, 0x16, 0xbc, 0x78, 0x0a, 0x92, 0xf8, 0x09, 0xfa, 0x09, 0x24, 0x33, 0x6b, 0xcb, 0xe6,
+	0x8f, 0xf4, 0x34, 0x3b, 0xf3, 0xde, 0xef, 0xcf, 0x7b, 0x6f, 0x51, 0x20, 0x39, 0x4b, 0x44, 0x0e,
+	0xd4, 0x8c, 0xec, 0x31, 0x18, 0x8a, 0x72, 0x1c, 0x15, 0x25, 0x18, 0xc0, 0xd7, 0x2a, 0x2c, 0x72,
+	0x58, 0xd0, 0x4e, 0x21, 0x05, 0x0b, 0xd1, 0xf9, 0x97, 0x63, 0x05, 0xb7, 0x52, 0x80, 0xf4, 0x40,
+	0x50, 0x56, 0x48, 0xca, 0x94, 0x02, 0xc3, 0x8c, 0x04, 0xa5, 0x2b, 0xf4, 0x21, 0x07, 0x9d, 0x83,
+	0xa6, 0x7d, 0xa6, 0x85, 0x6b, 0x4e, 0x3f, 0xee, 0xf4, 0x85, 0x61, 0x3b, 0xb4, 0x60, 0xa9, 0x54,
+	0x96, 0x5c, 0x71, 0x6f, 0x2e, 0xec, 0x52, 0xb0, 0x92, 0xe5, 0x55, 0x23, 0xd2, 0x46, 0xf8, 0xdd,
+	0xbc, 0xfc, 0xad, 0x7d, 0x8c, 0xc5, 0x60, 0x28, 0xb4, 0x21, 0xaf, 0xd0, 0x8d, 0xda, 0xab, 0x2e,
+	0x40, 0x69, 0x81, 0x9f, 0xa0, 0x96, 0x2b, 0xf6, 0xbd, 0x3b, 0xde, 0x83, 0xcb, 0xbb, 0x5b, 0x51,
+	0x5d, 0x4a, 0xe4, 0xf8, 0xdd, 0x4b, 0xc7, 0x93, 0x4e, 0x23, 0xae, 0xb8, 0xc4, 0xa0, 0xdb, 0xb6,
+	0xd9, 0xbe, 0x32, 0xa2, 0xe4, 0x19, 0x93, 0x6a, 0x8f, 0x73, 0x18, 0x2a, 0x53, 0x4d, 0xc3, 0x6d,
+	0xb4, 0x01, 0x9f, 0x94, 0x28, 0x6d, 0xd7, 0xcd, 0xd8, 0x5d, 0xf0, 0x33, 0x74, 0x95, 0x83, 0x52,
+	0x82, 0xcf, 0xa5, 0xf4, 0x64, 0xe2, 0x37, 0xe7, 0x68, 0xd7, 0x3f, 0x9d, 0x74, 0xda, 0x63, 0x96,
+	0x1f, 0x3c, 0x25, 0x35, 0x98, 0xc4, 0x57, 0xce, 0xef, 0xfb, 0x09, 0xf9, 0xe2, 0xa1, 0x70, 0xdd,
+	0xd8, 0x4a, 0x0e, 0x47, 0x81, 0x3c, 0x03, 0x7b, 0xcc, 0xa1, 0x3d, 0x96, 0x24, 0xa5, 0xd0, 0x4e,
+	0xe2, 0x66, 0xf7, 0xfe, 0xe9, 0xa4, 0x73, 0xd7, 0x8d, 0x5b, 0xcf, 0x25, 0xb1, 0x2f, 0x17, 0xa7,
+	0xec, 0x39, 0x68, 0xf7, 0x7b, 0x13, 0x6d, 0xd8, 0x3d, 0xf0, 0x00, 0xb5, 0x9c, 0x3f, 0x98, 0x2c,
+	0xfa, 0xb6, 0x1c, 0x41, 0x70, 0xef, 0xbf, 0x1c, 0xa7, 0x80, 0x84, 0x9f, 0x7f, 0xfe, 0xf9, 0xd6,
+	0xf4, 0xf1, 0x16, 0x5d, 0x99, 0x31, 0xfe, 0xe1, 0xa1, 0xeb, 0x4b, 0xfa, 0xf1, 0xf6, 0xca, 0xd6,
+	0xeb, 0xe2, 0x09, 0xa2, 0x8b, 0xd2, 0xab, 0xa5, 0x5e, 0xdb, 0xa5, 0x5e, 0xe2, 0xe7, 0xd4, 0x9a,
+	0xb2, 0x6d, 0x46, 0x74, 0xd9, 0x3a, 0x6a, 0x43, 0xa6, 0x87, 0xf6, 0x38, 0xa2, 0xe7, 0xd1, 0xd1,
+	0xc3, 0x5a, 0xac, 0x47, 0xdd, 0x17, 0xc7, 0xd3, 0xd0, 0x3b, 0x99, 0x86, 0xde, 0xef, 0x69, 0xe8,
+	0x7d, 0x9d, 0x85, 0x8d, 0x93, 0x59, 0xd8, 0xf8, 0x35, 0x0b, 0x1b, 0x1f, 0x1e, 0xa5, 0xd2, 0x64,
+	0xc3, 0x7e, 0xc4, 0x21, 0xa7, 0xef, 0x33, 0xa6, 0xb2, 0x37, 0x19, 0x53, 0xea, 0xcc, 0x8a, 0xd1,
+	0x3f, 0x33, 0xcc, 0xb8, 0x10, 0xba, 0xdf, 0xb2, 0x3f, 0xfc, 0xe3, 0xbf, 0x01, 0x00, 0x00, 0xff,
+	0xff, 0x28, 0x3f, 0x65, 0xef, 0x9b, 0x03, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -157,6 +268,8 @@ const _ = grpc.SupportPackageIsVersion4
 type QueryClient interface {
 	// Parameters queries the parameters of the module.
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
+	// QueryInterchainAccount returns the interchain account for given owner address on a given connection pair
+	InterchainAccount(ctx context.Context, in *QueryInterchainAccountRequest, opts ...grpc.CallOption) (*QueryInterchainAccountResponse, error)
 }
 
 type queryClient struct {
@@ -176,10 +289,21 @@ func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts .
 	return out, nil
 }
 
+func (c *queryClient) InterchainAccount(ctx context.Context, in *QueryInterchainAccountRequest, opts ...grpc.CallOption) (*QueryInterchainAccountResponse, error) {
+	out := new(QueryInterchainAccountResponse)
+	err := c.cc.Invoke(ctx, "/icademo.txdemo.Query/InterchainAccount", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 type QueryServer interface {
 	// Parameters queries the parameters of the module.
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
+	// QueryInterchainAccount returns the interchain account for given owner address on a given connection pair
+	InterchainAccount(context.Context, *QueryInterchainAccountRequest) (*QueryInterchainAccountResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
@@ -188,6 +312,9 @@ type UnimplementedQueryServer struct {
 
 func (*UnimplementedQueryServer) Params(ctx context.Context, req *QueryParamsRequest) (*QueryParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Params not implemented")
+}
+func (*UnimplementedQueryServer) InterchainAccount(ctx context.Context, req *QueryInterchainAccountRequest) (*QueryInterchainAccountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InterchainAccount not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
@@ -212,6 +339,24 @@ func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_InterchainAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryInterchainAccountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).InterchainAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/icademo.txdemo.Query/InterchainAccount",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).InterchainAccount(ctx, req.(*QueryInterchainAccountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var Query_serviceDesc = _Query_serviceDesc
 var _Query_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "icademo.txdemo.Query",
@@ -220,6 +365,10 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Params",
 			Handler:    _Query_Params_Handler,
+		},
+		{
+			MethodName: "InterchainAccount",
+			Handler:    _Query_InterchainAccount_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -282,6 +431,73 @@ func (m *QueryParamsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *QueryInterchainAccountRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryInterchainAccountRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryInterchainAccountRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.ConnectionId) > 0 {
+		i -= len(m.ConnectionId)
+		copy(dAtA[i:], m.ConnectionId)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.ConnectionId)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Owner) > 0 {
+		i -= len(m.Owner)
+		copy(dAtA[i:], m.Owner)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.Owner)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryInterchainAccountResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryInterchainAccountResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryInterchainAccountResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.InterchainAccountAddress) > 0 {
+		i -= len(m.InterchainAccountAddress)
+		copy(dAtA[i:], m.InterchainAccountAddress)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.InterchainAccountAddress)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	offset -= sovQuery(v)
 	base := offset
@@ -310,6 +526,36 @@ func (m *QueryParamsResponse) Size() (n int) {
 	_ = l
 	l = m.Params.Size()
 	n += 1 + l + sovQuery(uint64(l))
+	return n
+}
+
+func (m *QueryInterchainAccountRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Owner)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	l = len(m.ConnectionId)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryInterchainAccountResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.InterchainAccountAddress)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
 	return n
 }
 
@@ -430,6 +676,202 @@ func (m *QueryParamsResponse) Unmarshal(dAtA []byte) error {
 			if err := m.Params.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryInterchainAccountRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryInterchainAccountRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryInterchainAccountRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Owner", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Owner = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ConnectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ConnectionId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryInterchainAccountResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryInterchainAccountResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryInterchainAccountResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field InterchainAccountAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.InterchainAccountAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

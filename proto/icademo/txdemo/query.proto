@@ -14,6 +14,10 @@ service Query {
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/icademo/txdemo/params";
   }
+  // QueryInterchainAccount returns the interchain account for given owner address on a given connection pair
+  rpc InterchainAccount(QueryInterchainAccountRequest) returns (QueryInterchainAccountResponse) {
+    option (google.api.http).get = "/inter-tx/interchain_account/owner/{owner}/connection/{connection_id}";
+  }
 }
 
 // QueryParamsRequest is request type for the Query/Params RPC method.
@@ -23,4 +27,15 @@ message QueryParamsRequest {}
 message QueryParamsResponse {
   // params holds all the parameters of this module.
   Params params = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryInterchainAccountRequest is the request type for the Query/InterchainAccountAddress RPC
+message QueryInterchainAccountRequest {
+  string owner         = 1;
+  string connection_id = 2 [(gogoproto.moretags) = "yaml:\"connection_id\""];
+}
+
+// QueryInterchainAccountResponse the response type for the Query/InterchainAccountAddress RPC
+message QueryInterchainAccountResponse {
+  string interchain_account_address = 1 [(gogoproto.moretags) = "yaml:\"interchain_account_address\""];
 }

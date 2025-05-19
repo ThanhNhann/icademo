@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"fmt"
 	// "strings"
 
@@ -25,7 +26,38 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 	}
 
 	cmd.AddCommand(CmdQueryParams())
+	cmd.AddCommand(CmdQueryInterchainAccount())
 	// this line is used by starport scaffolding # 1
+
+	return cmd
+}
+
+func CmdQueryInterchainAccount() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "interchain-account [connection-id] [owner]",
+		Short: "Query the interchain account address",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			connectionID := args[0]
+			owner := args[1]
+
+			queryClient := types.NewQueryClient(clientCtx)
+			res, err := queryClient.InterchainAccount(context.Background(), &types.QueryInterchainAccountRequest{
+				ConnectionId: connectionID,
+				Owner:        owner,
+			})
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
 
 	return cmd
 }
