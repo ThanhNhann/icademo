@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package icademo.txdemo;
+
+import "gogoproto/gogo.proto";
+import "icademo/txdemo/params.proto";
+
+option go_package = "icademo/x/txdemo/types";
+
+// GenesisState defines the txdemo module's genesis state.
+message GenesisState {
+  Params params  = 1 [(gogoproto.nullable) = false];
+  string port_id = 2;
+}
+

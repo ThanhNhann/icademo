@@ -1,0 +1,7 @@
+syntax = "proto3";
+package icademo.txdemo;
+
+option go_package = "icademo/x/txdemo/types";
+
+// Msg defines the Msg service.
+service Msg {}

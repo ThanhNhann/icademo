@@ -1,0 +1,13 @@
+syntax = "proto3";
+package icademo.txdemo;
+
+option go_package = "icademo/x/txdemo/types";
+
+message TxdemoPacketData {
+    oneof packet {
+        NoData noData = 1;
+    }
+}
+
+message NoData {
+}
