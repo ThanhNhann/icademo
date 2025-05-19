@@ -1,6 +1,13 @@
 vue/node_modules
 vue/dist
-release/
-.idea/
-.vscode/
-.DS_Store
+.vscode
+secret.yml
+build
+.idea
+.vscode
+
+# data for local chains
+data
+
+.vscode
+vendor

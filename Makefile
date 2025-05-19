@@ -17,6 +17,14 @@ COMMIT_HASH := $(shell git rev-parse --short=7 HEAD)
 DOCKER_TAG := $(COMMIT_HASH)
 
 ###############################################################################
+###                           Install                                       ###
+###############################################################################
+install: go.sum
+		@echo "--> Installing icademod"
+		@go install ./cmd/icademod
+
+
+###############################################################################
 ###                                Protobuf                                 ###
 ###############################################################################
 
@@ -45,3 +53,27 @@ proto-breaking-check:
 	@echo "🤖 Running protobuf breaking check against main branch..."
 	@$(protoImage) buf breaking --against '.git#branch=main'
 	@echo "✅ Completed protobuf breaking check!"
+
+
+###############################################################################
+###                                Initialize                               ###
+###############################################################################
+
+init-golang-rly: kill-dev install
+	@echo "Initializing both blockchains..."
+	./network/init.sh
+	./network/start.sh
+	@echo "Initializing relayer..."
+	./network/relayer/rly-init.sh
+
+start: 
+	@echo "Starting up test network"
+	./network/start.sh
+
+start-golang-rly:
+	./network/relayer/rly-start.sh
+
+kill-dev:
+	@echo "Killing icademod and removing previous data"
+	-@rm -rf ./data
+	-@killall icademod 2>/dev/null
