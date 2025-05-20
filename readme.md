@@ -1,52 +1,67 @@
 # icademo
 **icademo** is a blockchain built using Cosmos SDK and Tendermint and created with [Ignite CLI](https://ignite.com/cli).
 
-## Get started
+## ICA Demo Guide
 
-```
-ignite chain serve
-```
+This guide will walk you through setting up and testing the Interchain Account (ICA) functionality.
 
-`serve` command installs dependencies, builds, initializes, and starts your blockchain in development.
+### Prerequisites
 
-### Configure
+- Go 1.19 or later
+- Ignite CLI
 
-Your blockchain in development can be configured with `config.yml`. To learn more, see the [Ignite CLI docs](https://docs.ignite.com).
+### Setup and Initialization
+```bash
+1. Bootstrap two chains, configure the relayer and create an IBC connection (on top of clients that are created as well)
 
-### Web Frontend
 
-Ignite CLI has scaffolded a Vue.js-based web app in the `vue` directory. Run the following commands to install dependencies and start the app:
+# go relayer
+make init-golang-relayer
 
-```
-cd vue
-npm install
-npm run serve
-```
+2. Start relayer:
 
-The frontend app is built using the `@starport/vue` and `@starport/vuex` packages. For details, see the [monorepo for Ignite front-end development](https://github.com/ignite/web).
-
-## Release
-To release a new version of your blockchain, create and push a new tag with `v` prefix. A new draft release with the configured targets will be created.
-
-```
-git tag v0.1
-git push origin v0.1
+```bash
+#go relayer
+make start-golang-rly
 ```
 
-After a draft release is created, make your final changes from the release page and publish it.
+### Creating and Managing Interchain Accounts
 
-### Install
-To install the latest version of your blockchain node's binary, execute the following command on your machine:
+0. Set up wallet (ref from scripts setup 2 chains)
 
+```bash
+# Store the following account addresses within the current shell env
+export WALLET_1=$(icad keys show wallet1 -a --keyring-backend test --home ./data/test-1) && echo $WALLET_1;
 ```
-curl https://get.ignite.com/username/icademo@latest! | sudo bash
+
+1. Create an ICA account on chain-2 from chain-1:
+
+```bash
+icademod tx txdemo register-ica-account connection-0 "" --from $WALLET_1 --chain-id test-1 --home ./data/test-1 --node tcp://localhost:26657 --keyring-backend test --gas auto --gas-adjustment 1.3 -y
 ```
-`username/icademo` should match the `username` and `repo_name` of the Github repository to which the source code was pushed. Learn more about [the install process](https://github.com/allinbits/starport-installer).
 
-## Learn more
+2. Query the ICA account:
 
-- [Ignite CLI](https://ignite.com/cli)
-- [Tutorials](https://docs.ignite.com/guide)
-- [Ignite CLI docs](https://docs.ignite.com)
-- [Cosmos SDK docs](https://docs.cosmos.network)
-- [Developer Chat](https://discord.gg/ignite)
+```bash
+# Query the ICA account on chain-1
+icademod q txdemo interchain-account connection-0 $WALLET_1 --home ./data/test-1 --node tcp://localhost:16657
+```
+
+### Troubleshooting
+
+If you encounter any issues:
+
+1. Check the node logs in `./data/test-1.log` and `./data/test-2.log`
+2. Ensure all ports are available and not in use
+
+### Cleanup
+
+To stop and clean up the demo:
+
+```bash
+# Stop the nodes
+pkill icademod
+
+# Remove the data directory
+rm -rf ./data
+```
