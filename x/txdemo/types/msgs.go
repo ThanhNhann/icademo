@@ -50,7 +50,12 @@ func (msg MsgRegisterAccount) GetSigners() []sdk.AccAddress {
 
 // NewMsgSubmitTx creates and returns a new MsgSubmitTx instance
 func NewMsgSubmitTx(sdkMsg sdk.Msg, connectionID, owner string) (*MsgSubmitTx, error) {
-	protoAny, err := PackTxMsgAny(sdkMsg)
+	msg, ok := sdkMsg.(proto.Message)
+	if !ok {
+		return nil, fmt.Errorf("cannot proto marshal %T", msg)
+	}
+
+	protoAny, err := codectypes.NewAnyWithValue(msg)
 	if err != nil {
 		return nil, err
 	}
@@ -62,19 +67,11 @@ func NewMsgSubmitTx(sdkMsg sdk.Msg, connectionID, owner string) (*MsgSubmitTx, e
 	}, nil
 }
 
-// PackTxMsgAny marshals the sdk.Msg payload to a protobuf Any type
-func PackTxMsgAny(sdkMsg sdk.Msg) (*codectypes.Any, error) {
-	msg, ok := sdkMsg.(proto.Message)
-	if !ok {
-		return nil, fmt.Errorf("can't proto marshal %T", sdkMsg)
-	}
+// UnpackInterfaces implements codectypes.UnpackInterfacesMessage
+func (msg MsgSubmitTx)	UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
+	var sdkMsg sdk.Msg
 
-	protoAny, err := codectypes.NewAnyWithValue(msg)
-	if err != nil {
-		return nil, err
-	}
-
-	return protoAny, nil
+	return unpacker.UnpackAny(msg.Msg, &sdkMsg)
 }
 
 // GetTxMsg fetches the cached any message

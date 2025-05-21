@@ -28,8 +28,14 @@ var _ types.MsgServer = msgServer{}
 func (k msgServer) RegisterAccount(goCtx context.Context, msg *types.MsgRegisterAccount) (*types.MsgRegisterAccountResponse, error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
+	ckMsgServer := icacontrollerkeeper.NewMsgServerImpl(&k.icaControllerKeeper)
 
-	if err := k.icaControllerKeeper.RegisterInterchainAccount(ctx, msg.ConnectionId, msg.Owner, msg.Version); err != nil {
+	_, err := ckMsgServer.RegisterInterchainAccount(ctx, icacontrollertypes.NewMsgRegisterInterchainAccount(
+		msg.ConnectionId,
+		msg.Owner,
+		msg.Version,
+	))
+	if err != nil {
 		return nil, err
 	}
 
@@ -38,11 +44,6 @@ func (k msgServer) RegisterAccount(goCtx context.Context, msg *types.MsgRegister
 
 func (k msgServer) SubmitTx(goCtx context.Context, msg *types.MsgSubmitTx) (*types.MsgSubmitTxResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	portOwner, err := icatypes.NewControllerPortID(msg.Owner)
-	if err != nil {
-		return nil, err
-	}
 
 	data, err := icatypes.SerializeCosmosTx(k.cdc, []proto.Message{msg.GetTxMsg()})
 	if err != nil {
@@ -57,7 +58,7 @@ func (k msgServer) SubmitTx(goCtx context.Context, msg *types.MsgSubmitTx) (*typ
 
 	timeoutTimestamp := ctx.BlockTime().Add(time.Minute).UnixNano()
 	ckMsgServer := icacontrollerkeeper.NewMsgServerImpl(&k.icaControllerKeeper)
-	msgSendTx := icacontrollertypes.NewMsgSendTx(portOwner, msg.ConnectionId, uint64(timeoutTimestamp), packetData)
+	msgSendTx := icacontrollertypes.NewMsgSendTx(msg.Owner, msg.ConnectionId, uint64(timeoutTimestamp), packetData)
 	_, err = ckMsgServer.SendTx(ctx, msgSendTx)
 	if err != nil {
 		return nil, err

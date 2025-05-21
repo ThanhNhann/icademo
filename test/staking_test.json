@@ -1,0 +1,9 @@
+{
+    "@type":"/cosmos.staking.v1beta1.MsgDelegate",
+    "delegator_address":"icademo1gwxrlec5u32vdwkyyhqjpc2u0736hks09s6jen6hfa0r93ykp3qs03xwmz",
+    "validator_address":"icademovaloper1qnk2n4nlkpw9xfqntladh74w6ujtulwnlj904e",
+    "amount": {
+        "denom": "stake",
+        "amount": "1000"
+    }
+}
