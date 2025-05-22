@@ -114,6 +114,18 @@ icademod q staking delegations-to icademovaloper1qnk2n4nlkpw9xfqntladh74w6ujtulw
 
 ```
 
+- Example 2: Bank Send
+
+```bash
+# Submit a bank send tx using the interchain account via ibc
+icademod tx txdemo submit-tx ./test/bank_send.json connection-0 --from $WALLET_1 --chain-id test-1 --home ./data/test-1 --node tcp://localhost:26657 --keyring-backend test -y
+
+# Wait until the relayer has relayed the packet
+
+# Query the interchain account balance on the host chain
+icademod q bank balances $ICA_ADDR --chain-id test-2 --node tcp://localhost:26667
+```
+
 ### Troubleshooting
 
 If you encounter any issues:

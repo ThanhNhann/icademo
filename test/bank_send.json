@@ -1,0 +1,11 @@
+{
+    "@type":"/cosmos.bank.v1beta1.MsgSend",
+    "from_address":"icademo1gwxrlec5u32vdwkyyhqjpc2u0736hks09s6jen6hfa0r93ykp3qs03xwmz",
+    "to_address":"icademo14zs2x38lmkw4eqvl3lpml5l8crzaxn6medy49k",
+    "amount": [
+        {
+            "denom": "stake",
+            "amount": "1000"
+        }
+    ]
+}
