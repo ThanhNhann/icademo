@@ -4,7 +4,11 @@ package icademo.txdemo;
 option go_package = "github.com/ThanhNhann/icademo/x/txdemo/types";
 
 import "gogoproto/gogo.proto";
+import "cosmos/msg/v1/msg.proto";
 import "google/protobuf/any.proto";
+import "cosmos_proto/cosmos.proto";
+import "icademo/txdemo/validator.proto";
+
 
 // Msg defines the Msg service.
 service Msg {
@@ -12,6 +16,8 @@ service Msg {
     rpc RegisterAccount(MsgRegisterAccount) returns (MsgRegisterAccountResponse);
     // SubmitTx defines a rpc handler for MsgSubmitTx
     rpc SubmitTx(MsgSubmitTx) returns (MsgSubmitTxResponse);
+    // AddValidators defines a rpc handler for MsgAddValidators
+    rpc AddValidators(MsgAddValidators) returns (MsgAddValidatorsResponse);
 }
 
 
@@ -20,7 +26,7 @@ message MsgRegisterAccount {
     option (gogoproto.equal)           = false;
     option (gogoproto.goproto_getters) = false;
   
-    string owner         = 1;
+    string owner         = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];;
     string connection_id = 2 [(gogoproto.moretags) = "yaml:\"connection_id\""];
     string version       = 3;
 }
@@ -33,10 +39,21 @@ message MsgSubmitTx {
     option (gogoproto.equal)           = false;
     option (gogoproto.goproto_getters) = false;
   
-    string              owner         = 1;
+    string              owner         = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
     string              connection_id = 2 [(gogoproto.moretags) = "yaml:\"connection_id\""];
     google.protobuf.Any msg           = 3;
 }
   
 // MsgSubmitTxResponse defines the response for Msg/SubmitTx
 message MsgSubmitTxResponse {}
+
+message MsgAddValidators {
+    option (gogoproto.equal)           = false;
+    option (gogoproto.goproto_getters) = false;
+    option (cosmos.msg.v1.signer) = "creator";
+
+    string owner = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];;
+    repeated Validator validators = 2;
+}
+
+message MsgAddValidatorsResponse {}

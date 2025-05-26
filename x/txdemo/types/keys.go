@@ -21,8 +21,8 @@ const (
 )
 
 var (
-	// PortKey defines the key to store the port ID in store
-	PortKey = KeyPrefix("txdemo-port-")
+	KeyPrefixPortKey   = []byte{0x01}
+	KeyPrefixValidator = []byte{0x02}
 )
 
 func KeyPrefix(p string) []byte {

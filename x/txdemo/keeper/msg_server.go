@@ -66,3 +66,24 @@ func (k msgServer) SubmitTx(goCtx context.Context, msg *types.MsgSubmitTx) (*typ
 
 	return &types.MsgSubmitTxResponse{}, nil
 }
+
+func (k msgServer) AddValidators(goCtx context.Context, msg *types.MsgAddValidators) (*types.MsgAddValidatorsResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	for _, validator := range msg.Validators {
+		_, err := sdk.ValAddressFromBech32(validator.Address)
+		if err != nil {
+			return nil, err
+		}
+
+		err = k.SetValidator(ctx, *validator)
+		if err != nil {
+			return nil, err
+		}
+		// add icq to check validator information
+		// icq := icacontrollertypes.NewICQ(validatorAddr, msg.ConnectionId, msg.Version)
+		// k.icaControllerKeeper.SetICQ(ctx, icq)
+	}
+
+	return &types.MsgAddValidatorsResponse{}, nil
+}
