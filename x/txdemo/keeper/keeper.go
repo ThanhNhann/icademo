@@ -16,6 +16,7 @@ import (
 	"github.com/cosmos/ibc-go/v7/modules/core/exported"
 
 	"github.com/ThanhNhann/icademo/x/txdemo/types"
+	interchainquerykeeper "github.com/ThanhNhann/icademo/x/interchainquery/keeper"
 )
 
 type (
@@ -29,6 +30,7 @@ type (
 		portKeeper          types.PortKeeper
 		scopedKeeper        exported.ScopedKeeper
 		icaControllerKeeper icacontrollerkeeper.Keeper
+		interchainqueryKeeper interchainquerykeeper.Keeper
 	}
 )
 
@@ -41,7 +43,7 @@ func NewKeeper(
 	portKeeper types.PortKeeper,
 	scopedKeeper exported.ScopedKeeper,
 	icaControllerKeeper icacontrollerkeeper.Keeper,
-
+	interchainqueryKeeper interchainquerykeeper.Keeper,
 ) *Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
@@ -58,6 +60,7 @@ func NewKeeper(
 		portKeeper:          portKeeper,
 		scopedKeeper:        scopedKeeper,
 		icaControllerKeeper: icaControllerKeeper,
+		interchainqueryKeeper: interchainqueryKeeper,
 	}
 }
 

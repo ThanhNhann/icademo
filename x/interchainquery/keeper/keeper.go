@@ -87,7 +87,7 @@ func (k *Keeper) MakeRequest(ctx sdk.Context, connection_id string, chain_id str
 	_, found := k.GetQuery(ctx, key)
 	if !found {
 		if module != "" {
-			k.callbacks[module].AddCallback(key, callback)
+			k.callbacks[module].AddICQCallback(key, callback)
 		}
 		newQuery := k.NewQuery(ctx, connection_id, chain_id, query_type, query_params, period)
 		k.SetQuery(ctx, *newQuery)

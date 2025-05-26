@@ -466,8 +466,8 @@ func New(
 
 	app.InterchainqueryKeeper = interchainquerykeeper.NewKeeper(appCodec, keys[interchainquerytypes.StoreKey])
 	interchainQueryModule := interchainquery.NewAppModule(appCodec, app.InterchainqueryKeeper)
-	//Enable ICQ callbacks
-	// app.InterchainqueryKeeper.SetCallbackHandler(txdemo.ModuleName, app.txdemoKeeper.CallbackHandler())
+	//Enable ICQ callbacks for Txdemo module
+	app.InterchainqueryKeeper.SetCallbackHandler(txdemomoduletypes.ModuleName, app.TxdemoKeeper.ICQCallbackHandler())
 
 	// ... other modules keepers
 
@@ -522,6 +522,7 @@ func New(
 		&app.IBCKeeper.PortKeeper,
 		scopedTxdemoKeeper,
 		app.ICAControllerKeeper,
+		app.InterchainqueryKeeper,
 	)
 
 	txdemoModule := txdemomodule.NewAppModule(appCodec, app.TxdemoKeeper, app.AccountKeeper, app.BankKeeper)

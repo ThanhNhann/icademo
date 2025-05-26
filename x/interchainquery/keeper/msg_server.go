@@ -24,7 +24,7 @@ func (k msgServer) SubmitQueryResponse(goCtx context.Context, msg *types.MsgSubm
 	q, found := k.GetQuery(ctx, msg.QueryId)
 	if found {
 		for _, module := range k.callbacks {
-			if module.Has(msg.QueryId) {
+			if module.HasICQCallback(msg.QueryId) {
 				err := module.Call(ctx, msg.QueryId, msg.Result, q)
 				if err != nil {
 					k.Logger(ctx).Error("Error in callback", "error", err, "msg", msg.QueryId, "result", msg.Result, "type", q.QueryType, "params", q.QueryParameters)
