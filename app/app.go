@@ -464,7 +464,7 @@ func New(
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
-	app.InterchainqueryKeeper = interchainquerykeeper.NewKeeper(appCodec, keys[interchainquerytypes.StoreKey])
+	app.InterchainqueryKeeper = interchainquerykeeper.NewKeeper(appCodec, keys[interchainquerytypes.StoreKey], app.IBCKeeper)
 	interchainQueryModule := interchainquery.NewAppModule(appCodec, app.InterchainqueryKeeper)
 	//Enable ICQ callbacks for Txdemo module
 	app.InterchainqueryKeeper.SetCallbackHandler(txdemomoduletypes.ModuleName, app.TxdemoKeeper.ICQCallbackHandler())
