@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Get previous tag
+        id: get_prev_tag
+        run: |
+          prev_tag=$(git tag --sort=-creatordate | grep '^v' | grep -v "${GITHUB_REF_NAME}" | head -n 1)
+          echo "prev_tag=$prev_tag" >> $GITHUB_OUTPUT
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          if [ -z "${{ steps.get_prev_tag.outputs.prev_tag }}" ]; then
+            git log --oneline > CHANGELOG.txt
+          else
+            git log ${{ steps.get_prev_tag.outputs.prev_tag }}..${GITHUB_REF_NAME} --oneline > CHANGELOG.txt
+          fi
+          
+      - name: Build binary with Make
+        run: make build
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body_path: CHANGELOG.txt
+          files: |
+            ./build/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

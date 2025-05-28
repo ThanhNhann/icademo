@@ -10,6 +10,14 @@ BINDIR ?= $(GOPATH)/bin
 # QS_DIR = quicksilver
 BUILDDIR ?= $(CURDIR)/build
 
+ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=stride \
+		  -X github.com/cosmos/cosmos-sdk/version.AppName=icademod \
+		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
+		  -X github.com/cosmos/cosmos-sdk/version.Version=$(COMMIT) \
+		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=netgo"
+
+BUILD_FLAGS := -tags "netgo" -ldflags "$(ldflags)" -trimpath -mod=readonly -modcacherw
+
 DOCKER := $(shell which docker)
 DOCKERCOMPOSE := $(shell which docker-compose)
 DOCKER_BUF := $(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace bufbuild/buf
@@ -17,11 +25,18 @@ COMMIT_HASH := $(shell git rev-parse --short=7 HEAD)
 DOCKER_TAG := $(COMMIT_HASH)
 
 ###############################################################################
-###                           Install                                       ###
+###                       Install, Build & Clean                            ###
 ###############################################################################
 install: go.sum
 		@echo "--> Installing icademod"
-		@go install ./cmd/icademod
+		@go install $(BUILD_FLAGS) ./cmd/icademod
+
+build: go.sum
+		@echo "--> Building icademod"
+		@go build $(BUILD_FLAGS) -o $(BUILDDIR)/icademod ./cmd/icademod
+
+clean:
+	rm -rf $(BUILDDIR)
 
 
 ###############################################################################
