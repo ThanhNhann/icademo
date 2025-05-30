@@ -8,6 +8,9 @@ on:
 jobs:
   changelog:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      discussions: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -45,3 +48,5 @@ jobs:
           body_path: CHANGELOG.txt
           files: |
             ./build/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
