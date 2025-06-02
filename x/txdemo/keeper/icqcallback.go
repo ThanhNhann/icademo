@@ -39,7 +39,7 @@ func (c ICQCallbacks) AddICQCallback(id string, fn interface{}) icqtypes.QueryCa
 }
 
 func (c ICQCallbacks) RegisterICQCallbacks() icqtypes.QueryCallbacks {
-	return nil
+	return c.AddICQCallback("test-callback", ICQCallback(nil))
 	// TODO: Add ICQ callbacks for Txdemo module with the following Callbacks:
 	//       These callbacks will be used to handle the ICQ requests and responses for unstake and claim rewards from host chain
 	// return c.

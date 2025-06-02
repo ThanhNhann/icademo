@@ -103,6 +103,6 @@ func (k Keeper) ValidateQuery(ctx sdk.Context, query types.Query) error {
 	if exists := k.callbacks[query.CallbackModule].HasICQCallback(query.CallbackId); !exists {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "callback-id (%s) is not registered for module (%s)", query.CallbackId, query.CallbackModule)
 	}
-
+	println("go to validate query")
 	return nil
 }

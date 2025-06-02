@@ -123,9 +123,10 @@ func (k Keeper) HandlerCallback(ctx sdk.Context, msg *types.MsgSubmitQueryRespon
 	// Loop through each module until the callbackId is found in one of the module handlers
 	for _, moduleName := range moduleNames {
 		moduleCallbackHandler := k.callbacks[moduleName]
-
+		println("module", moduleName)
 		// Once the callback is found, invoke the function
 		if moduleCallbackHandler.HasICQCallback(query.CallbackId) {
+			println("callback found", query.CallbackId)
 			if err := moduleCallbackHandler.Call(ctx, query.CallbackId, msg.Result, query); err != nil {
 				k.Logger(ctx).Error(fmt.Sprintf("Error invoking ICQ callback, error: %s, %s, Query Response: %s",
 					err.Error(), query.CallbackId, msg.Result))
@@ -135,7 +136,7 @@ func (k Keeper) HandlerCallback(ctx sdk.Context, msg *types.MsgSubmitQueryRespon
 			return nil
 		}
 	}
-
+	println("go to here dcm")
 	// If no callback was found, return an error
 	return types.ErrICQCallbackNotFound
 }
