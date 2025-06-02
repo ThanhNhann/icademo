@@ -2,7 +2,7 @@ syntax = "proto3";
 package icademo.interchainquery;
 
 import "gogoproto/gogo.proto";
-import "cosmos_proto/cosmos.proto";
+import "google/protobuf/duration.proto";
 
 option go_package = "github.com/ThanhNhann/icademo/x/interchainquery/types";
 
@@ -11,32 +11,16 @@ message Query {
     string connection_id = 2;
     string chain_id = 3;
     string query_type = 4;
-    map<string, string> query_parameters = 5;
-    string period = 6 [
-      (cosmos_proto.scalar) = "cosmos.Int",
-      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-      (gogoproto.nullable) = false
-    ];
-    string last_height = 7 [
-      (cosmos_proto.scalar) = "cosmos.Int",
-      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-      (gogoproto.nullable) = false
-    ];
-}
-
-message DataPoint {
-    string id = 1;
-    string remote_height = 2 [
-      (cosmos_proto.scalar) = "cosmos.Int",
-      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-      (gogoproto.nullable) = false
-    ];
-    string local_height = 3 [
-      (cosmos_proto.scalar) = "cosmos.Int",
-      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-      (gogoproto.nullable) = false
-    ];
-    bytes value = 4 [ (gogoproto.jsontag) = "result,omitempty" ];
+    bytes request = 5;
+    string callback_module = 6;
+    string callback_id = 7;
+    // TODO:currently we setup timeout for 10 minutes, it should be changed to a dynamic value in the future
+    uint64 timeout_timestamp = 8;
+    google.protobuf.Duration timeout_duration = 9
+      [ (gogoproto.nullable) = false, (gogoproto.stdduration) = true ];
+    uint64 last_height = 10;
+    uint64 submission_height = 11;
+    bool is_sent = 12;
 }
 
 // GenesisState defines the epochs module's genesis state.
