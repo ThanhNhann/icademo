@@ -3,6 +3,8 @@ package keeper
 import (
 	"fmt"
 
+	errorsmod "cosmossdk.io/errors"
+
 	"github.com/cometbft/cometbft/libs/log"
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
@@ -11,12 +13,16 @@ import (
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	icacontrollerkeeper "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/controller/keeper"
+	clienttypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
+	connectiontypes "github.com/cosmos/ibc-go/v7/modules/core/03-connection/types"
 	channeltypes "github.com/cosmos/ibc-go/v7/modules/core/04-channel/types"
 	host "github.com/cosmos/ibc-go/v7/modules/core/24-host"
 	"github.com/cosmos/ibc-go/v7/modules/core/exported"
+	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
+	ibctmtypes "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint"
 
-	"github.com/ThanhNhann/icademo/x/txdemo/types"
 	interchainquerykeeper "github.com/ThanhNhann/icademo/x/interchainquery/keeper"
+	"github.com/ThanhNhann/icademo/x/txdemo/types"
 )
 
 type (
@@ -26,11 +32,13 @@ type (
 		memKey     storetypes.StoreKey
 		paramstore paramtypes.Subspace
 
-		channelKeeper       types.ChannelKeeper
-		portKeeper          types.PortKeeper
-		scopedKeeper        exported.ScopedKeeper
-		icaControllerKeeper icacontrollerkeeper.Keeper
+		channelKeeper         types.ChannelKeeper
+		portKeeper            types.PortKeeper
+		scopedKeeper          exported.ScopedKeeper
+		icaControllerKeeper   icacontrollerkeeper.Keeper
 		interchainqueryKeeper interchainquerykeeper.Keeper
+		ibcKeeper             ibckeeper.Keeper
+		accountKeeper         types.AccountKeeper
 	}
 )
 
@@ -44,6 +52,8 @@ func NewKeeper(
 	scopedKeeper exported.ScopedKeeper,
 	icaControllerKeeper icacontrollerkeeper.Keeper,
 	interchainqueryKeeper interchainquerykeeper.Keeper,
+	ibcKeeper ibckeeper.Keeper,
+	accountKeeper types.AccountKeeper,
 ) *Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
@@ -56,11 +66,13 @@ func NewKeeper(
 		memKey:     memKey,
 		paramstore: ps,
 
-		channelKeeper:       channelKeeper,
-		portKeeper:          portKeeper,
-		scopedKeeper:        scopedKeeper,
-		icaControllerKeeper: icaControllerKeeper,
+		channelKeeper:         channelKeeper,
+		portKeeper:            portKeeper,
+		scopedKeeper:          scopedKeeper,
+		icaControllerKeeper:   icaControllerKeeper,
 		interchainqueryKeeper: interchainqueryKeeper,
+		ibcKeeper:             ibcKeeper,
+		accountKeeper:         accountKeeper,
 	}
 }
 
@@ -116,4 +128,22 @@ func (k Keeper) ClaimCapability(ctx sdk.Context, cap *capabilitytypes.Capability
 
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
+}
+
+// Lookup a chain ID from a connection ID by looking up the client state
+func (k Keeper) GetChainIdFromConnectionId(ctx sdk.Context, connectionID string) (string, error) {
+	connection, found := k.ibcKeeper.ConnectionKeeper.GetConnection(ctx, connectionID)
+	if !found {
+		return "", errorsmod.Wrapf(connectiontypes.ErrConnectionNotFound, "connection %s not found", connectionID)
+	}
+	clientState, found := k.ibcKeeper.ClientKeeper.GetClientState(ctx, connection.ClientId)
+	if !found {
+		return "", errorsmod.Wrapf(clienttypes.ErrClientNotFound, "client %s not found", connection.ClientId)
+	}
+	client, ok := clientState.(*ibctmtypes.ClientState)
+	if !ok {
+		return "", errorsmod.Wrapf(types.ErrClientStateNotTendermint, "client %s not found", connection.ClientId)
+	}
+
+	return client.ChainId, nil
 }

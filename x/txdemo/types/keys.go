@@ -23,6 +23,8 @@ const (
 var (
 	// PortKey defines the key to store the port ID in store
 	PortKey = KeyPrefix("txdemo-port-")
+	// HostZoneKey defines the key to store the host zone in store
+	HostZoneKey = KeyPrefix("HostZone-value-")
 )
 
 func KeyPrefix(p string) []byte {

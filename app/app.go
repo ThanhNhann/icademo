@@ -523,6 +523,8 @@ func New(
 		scopedTxdemoKeeper,
 		app.ICAControllerKeeper,
 		app.InterchainqueryKeeper,
+		*app.IBCKeeper,
+		app.AccountKeeper,
 	)
 
 	txdemoModule := txdemomodule.NewAppModule(appCodec, app.TxdemoKeeper, app.AccountKeeper, app.BankKeeper)
