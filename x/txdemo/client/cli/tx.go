@@ -34,6 +34,7 @@ func GetTxCmd() *cobra.Command {
 
 	cmd.AddCommand(RegisterAccountCmd())
 	cmd.AddCommand(SubmitTxCmd())
+	cmd.AddCommand(RegisterHostZone())
 	// this line is used by starport scaffolding # 1
 
 	return cmd
@@ -108,7 +109,7 @@ func SubmitTxCmd() *cobra.Command {
 	return cmd
 }
 
-func CmdRegisterHostZone() *cobra.Command {
+func RegisterHostZone() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "register-host-zone [connection-id] [host-denom] [bech32prefix] [ibc-denom] [channel-id] [unbonding-period]",
 		Short: "Broadcast message register-host-zone",
