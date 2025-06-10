@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -18,6 +19,7 @@ import (
 
 var (
 	DefaultRelativePacketTimeoutTimestamp = uint64((time.Duration(10) * time.Minute).Nanoseconds())
+	FlagMaxMessagesPerIcaTx               = "max-messages-per-ica-tx"
 )
 
 // GetTxCmd returns the transaction commands for this module
@@ -32,6 +34,7 @@ func GetTxCmd() *cobra.Command {
 
 	cmd.AddCommand(RegisterAccountCmd())
 	cmd.AddCommand(SubmitTxCmd())
+	cmd.AddCommand(RegisterHostZone())
 	// this line is used by starport scaffolding # 1
 
 	return cmd
@@ -102,6 +105,57 @@ func SubmitTxCmd() *cobra.Command {
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func RegisterHostZone() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "register-host-zone [connection-id] [host-denom] [bech32prefix] [ibc-denom] [channel-id] [unbonding-period]",
+		Short: "Broadcast message register-host-zone",
+		Args:  cobra.ExactArgs(7),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			connectionId := args[0]
+			hostDenom := args[1]
+			bech32prefix := args[2]
+			ibcDenom := args[3]
+			channelId := args[4]
+			unbondingPeriod, err := strconv.ParseUint(args[5], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			maxMessagesPerIcaTx, err := cmd.Flags().GetUint64(FlagMaxMessagesPerIcaTx)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgRegisterHostZone(
+				clientCtx.GetFromAddress().String(),
+				connectionId,
+				bech32prefix,
+				hostDenom,
+				ibcDenom,
+				channelId,
+				unbondingPeriod,
+				maxMessagesPerIcaTx,
+			)
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	cmd.Flags().Uint64(FlagMaxMessagesPerIcaTx, 0, "maximum number of ICA txs in a given tx")
 
 	return cmd
 }
