@@ -512,6 +512,7 @@ func New(
 		scopedICAHostKeeper,
 		app.MsgServiceRouter(),
 	)
+	app.ICAHostKeeper.WithQueryRouter(app.GRPCQueryRouter())
 
 	app.TxdemoKeeper = *txdemomodulekeeper.NewKeeper(
 		appCodec,

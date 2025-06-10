@@ -11,6 +11,7 @@ import (
 	proto "github.com/gogo/protobuf/proto"
 
 	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
+	"github.com/ThanhNhann/icademo/testutil"
 )
 
 var (
@@ -157,10 +158,10 @@ func (msg *MsgRegisterHostZone) ValidateBasic() error {
 	if err != nil {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
-	// TODO: add a list admin for registerHostZone
-	// if err := utils.ValidateAdminAddress(msg.Creator); err != nil {
-	// 	return err
-	// }
+
+	if err := testutil.ValidateAdminAddress(msg.Creator); err != nil {
+		return err
+	}
 	// VALIDATE DENOMS
 	// host denom cannot be empty
 	if msg.HostDenom == "" {
