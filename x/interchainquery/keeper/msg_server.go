@@ -2,9 +2,20 @@ package keeper
 
 import (
 	"context"
+	"fmt"
+	"sort"
+	"strings"
+
+	errorsmod "cosmossdk.io/errors"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	clienttypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
+	commitmenttypes "github.com/cosmos/ibc-go/v7/modules/core/23-commitment/types"
+	"github.com/cosmos/ibc-go/v7/modules/core/exported"
+	tendermint "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint"
+	ics23 "github.com/cosmos/ics23/go"
+	"github.com/spf13/cast"
 
 	"github.com/ThanhNhann/icademo/x/interchainquery/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type msgServer struct {
@@ -19,41 +30,151 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 
 var _ types.MsgServer = msgServer{}
 
-func (k msgServer) SubmitQueryResponse(goCtx context.Context, msg *types.MsgSubmitQueryResponse) (*types.MsgSubmitQueryResponseResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-	q, found := k.GetQuery(ctx, msg.QueryId)
-	if found {
-		for _, module := range k.callbacks {
-			if module.HasICQCallback(msg.QueryId) {
-				err := module.Call(ctx, msg.QueryId, msg.Result, q)
-				if err != nil {
-					k.Logger(ctx).Error("Error in callback", "error", err, "msg", msg.QueryId, "result", msg.Result, "type", q.QueryType, "params", q.QueryParameters)
-					return nil, err
-				}
-			}
-		}
-		//q.LastHeight = sdk.NewInt(ctx.BlockHeight())
+// check if the query requires proving; if it does, verify it!
+func (k Keeper) VerifyKeyProof(ctx sdk.Context, msg *types.MsgSubmitQueryResponse, query types.Query) error {
+	pathParts := strings.Split(query.QueryType, "/")
 
-		if err := k.SetDatapointForId(ctx, msg.QueryId, msg.Result, sdk.NewInt(msg.Height)); err != nil {
-			return nil, err
-		}
+	// the query does NOT have an associated proof, so no need to verify it.
+	if pathParts[len(pathParts)-1] != "key" {
+		return nil
+	}
 
-		if q.Period.IsNegative() {
-			k.DeleteQuery(ctx, msg.QueryId)
-		} else {
-			k.SetQuery(ctx, q)
+	// If the query is a "key" proof query, verify the results are valid by checking the poof
+	if msg.ProofOps == nil {
+		return errorsmod.Wrapf(types.ErrInvalidICQProof, "Unable to validate proof. No proof submitted")
+	}
+
+	// Get the client consensus state at the height 1 block above the message height
+	proofHeight, err := cast.ToUint64E(msg.Height)
+	if err != nil {
+		return err
+	}
+	height := clienttypes.NewHeight(clienttypes.ParseChainID(query.ChainId), proofHeight+1)
+
+	// Confirm the query proof height occurred after the submission height
+	if proofHeight <= query.SubmissionHeight {
+		return errorsmod.Wrapf(types.ErrInvalidICQProof,
+			"Query proof height (%d) is older than the submission height (%d)", proofHeight, query.SubmissionHeight)
+	}
+
+	// Get the client state and consensus state from the connection Id
+	connection, found := k.IBCKeeper.ConnectionKeeper.GetConnection(ctx, query.ConnectionId)
+	if !found {
+		return errorsmod.Wrapf(types.ErrInvalidICQProof, "ConnectionId %s does not exist", query.ConnectionId)
+	}
+	consensusState, found := k.IBCKeeper.ClientKeeper.GetClientConsensusState(ctx, connection.ClientId, height)
+	if !found {
+		return errorsmod.Wrapf(types.ErrInvalidICQProof, "Consensus state not found for client %s and height %d", connection.ClientId, height)
+	}
+	clientState, found := k.IBCKeeper.ClientKeeper.GetClientState(ctx, connection.ClientId)
+	if !found {
+		return errorsmod.Wrapf(types.ErrInvalidICQProof, "Unable to fetch client state for client %s", connection.ClientId)
+	}
+
+	// Cast the client and consensus state to tendermint type
+	tendermintConsensusState, ok := consensusState.(*tendermint.ConsensusState)
+	if !ok {
+		return errorsmod.Wrapf(types.ErrInvalidICQProof,
+			"Only tendermint consensus state is supported (%s provided)", consensusState.ClientType())
+	}
+	tendermintClientState, ok := clientState.(*tendermint.ClientState)
+	if !ok {
+		return errorsmod.Wrapf(types.ErrInvalidICQProof,
+			"Only tendermint client state is supported (%s provided)", clientState.ClientType())
+	}
+	var stateRoot exported.Root = tendermintConsensusState.Root
+	var clientStateProof []*ics23.ProofSpec = tendermintClientState.ProofSpecs
+
+	// Get the merkle path and merkle proof
+	path := commitmenttypes.NewMerklePath([]string{pathParts[1], string(query.Request)}...)
+	merkleProof, err := commitmenttypes.ConvertProofs(msg.ProofOps)
+	if err != nil {
+		return errorsmod.Wrapf(types.ErrInvalidICQProof, "Error converting proofs: %s", err.Error())
+	}
+
+	// If we got a non-nil response, verify inclusion proof
+	if len(msg.Result) != 0 {
+		if err := merkleProof.VerifyMembership(clientStateProof, stateRoot, path, msg.Result); err != nil {
+			return errorsmod.Wrapf(types.ErrInvalidICQProof, "Unable to verify membership proof: %s", err.Error())
 		}
+		k.Logger(ctx).Info(fmt.Sprintf("Inclusion proof validated - QueryId %s - ChainId %s - CallbackId %s", query.Id, query.ChainId, query.CallbackId))
 
 	} else {
+		// if we got a nil query response, verify non inclusion proof.
+		if err := merkleProof.VerifyNonMembership(clientStateProof, stateRoot, path); err != nil {
+			return errorsmod.Wrapf(types.ErrInvalidICQProof, "Unable to verify non-membership proof: %s", err.Error())
+		}
+		k.Logger(ctx).Info(fmt.Sprintf("Non-inclusion proof validated - QueryId %s - ChainId %s - CallbackId %s", query.Id, query.ChainId, query.CallbackId))
+	}
+
+	return nil
+}
+
+// call the query's associated callback function
+func (k Keeper) HandlerCallback(ctx sdk.Context, msg *types.MsgSubmitQueryResponse, query types.Query) error {
+	// get all the callback handlers and sort them for determinism
+	// (each module has their own callback handler)
+	moduleNames := []string{}
+	for moduleName := range k.callbacks {
+		moduleNames = append(moduleNames, moduleName)
+	}
+	sort.Strings(moduleNames)
+
+	// Loop through each module until the callbackId is found in one of the module handlers
+	for _, moduleName := range moduleNames {
+		moduleCallbackHandler := k.callbacks[moduleName]
+		println("module", moduleName)
+		// Once the callback is found, invoke the function
+		if moduleCallbackHandler.HasICQCallback(query.CallbackId) {
+			println("callback found", query.CallbackId)
+			if err := moduleCallbackHandler.Call(ctx, query.CallbackId, msg.Result, query); err != nil {
+				k.Logger(ctx).Error(fmt.Sprintf("Error invoking ICQ callback, error: %s, %s, Query Response: %s",
+					err.Error(), query.CallbackId, msg.Result))
+
+				return err
+			}
+			return nil
+		}
+	}
+	println("go to here dcm")
+	// If no callback was found, return an error
+	return types.ErrICQCallbackNotFound
+}
+
+func (k msgServer) SubmitQueryResponse(goCtx context.Context, msg *types.MsgSubmitQueryResponse) (*types.MsgSubmitQueryResponseResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	query, found := k.GetQuery(ctx, msg.QueryId)
+	if !found {
+		k.Logger(ctx).Error("ICQ RESPONSE  | Ignoring non-existent query response (note: duplicate responses are nonexistent)")
 		return &types.MsgSubmitQueryResponseResponse{}, nil // technically this is an error, but will cause the entire tx to fail if we have one 'bad' message, so we can just no-op here.
 	}
 
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-		),
-	})
+	err := k.VerifyKeyProof(ctx, msg, query)
+	if err != nil {
+		k.Logger(ctx).Error("QUERY PROOF VERIFICATION FAILED - QueryId: %s, ChainId: %s, CallbackId: %s, Error: %s", query.Id, query.ChainId, query.CallbackId, err.Error())
+		return nil, err
+	}
+
+	// Immediately delete the query so it cannot process again
+	k.DeleteQuery(ctx, query.Id)
+
+	// If the query is contentless, end here
+	if len(msg.Result) == 0 {
+		k.Logger(ctx).Info(fmt.Sprintf("QUERY RESPONSE IS CONTENTLESS - QueryId: %s, ChainId: %s, CallbackId: %s", query.Id, query.ChainId, query.CallbackId))
+		return &types.MsgSubmitQueryResponseResponse{}, nil
+	}
+
+	if query.TimeoutTimestamp < uint64(ctx.BlockTime().UnixNano()) {
+		k.Logger(ctx).Info(fmt.Sprintf("ICQ RETRY - Query Type: %s, ChainId: %s, CallbackId: %s, Query ID: %s", query.QueryType, query.ChainId, query.CallbackId, query.Id))
+		if err := k.RetryICQRequest(ctx, query); err != nil {
+			return nil, err
+		}
+		return &types.MsgSubmitQueryResponseResponse{}, nil
+	}
+
+	if err := k.HandlerCallback(ctx, msg, query); err != nil {
+		return nil, err
+	}
 
 	return &types.MsgSubmitQueryResponseResponse{}, nil
 }
