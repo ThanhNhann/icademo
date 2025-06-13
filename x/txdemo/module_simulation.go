@@ -3,7 +3,7 @@ package txdemo
 import (
 	"math/rand"
 
-	"github.com/ThanhNhann/icademo/testutil/sample"
+	"github.com/ThanhNhann/icademo/utils/sample"
 
 	txdemosimulation "github.com/ThanhNhann/icademo/x/txdemo/simulation"
 	"github.com/ThanhNhann/icademo/x/txdemo/types"
