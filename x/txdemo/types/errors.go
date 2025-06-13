@@ -15,4 +15,5 @@ var (
 	ErrHaltedHostZone           = sdkerrors.Register(ModuleName, 1503, "host zone halted")
 	ErrClientStateNotTendermint = sdkerrors.Register(ModuleName, 1504, "client state not tendermint")
 	ErrFailedToRegisterHostZone = sdkerrors.Register(ModuleName, 1505, "failed to register host zone")
+	ErrValidatorAlreadyExists   = sdkerrors.Register(ModuleName, 1506, "validator already exist")
 )

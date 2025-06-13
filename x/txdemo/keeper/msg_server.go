@@ -75,6 +75,19 @@ func (k msgServer) SubmitTx(goCtx context.Context, msg *types.MsgSubmitTx) (*typ
 	return &types.MsgSubmitTxResponse{}, nil
 }
 
+func (k msgServer) AddValidators(goCtx context.Context, msg *types.MsgAddValidators) (*types.MsgAddValidatorsResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	for _, validator := range msg.Validators {
+		if err := k.AddValidatorToHostZone(ctx, msg.HostZone, *validator, false); err != nil {
+			return nil, err
+		}
+		// TODO: add icq to tracking status of validator here (slash, tombs toned ?)
+	}
+
+	return &types.MsgAddValidatorsResponse{}, nil
+}
+
 // createModuleAccount creates a module account for the given address
 func (k Keeper) createModuleAccount(ctx sdk.Context, addr sdk.AccAddress) error {
 	// Check if account already exists
@@ -193,3 +206,4 @@ func (k msgServer) RegisterHostZone(goCtx context.Context, msg *types.MsgRegiste
 
 	return &types.MsgRegisterHostZoneResponse{}, nil
 }
+
