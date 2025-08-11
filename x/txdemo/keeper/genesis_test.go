@@ -1,7 +1,7 @@
 package keeper_test
 
 import (
-	"github.com/ThanhNhann/icademo/testutil/nullify"
+	"github.com/ThanhNhann/icademo/utils/nullify"
 
 	"github.com/ThanhNhann/icademo/x/txdemo/types"
 )
