@@ -6,6 +6,8 @@ const (
 	AttributeKeyConnectionId = "connection_id"
 	AttributeKeyType         = "type"
 	AttributeKeyParams       = "parameters"
+	AttributeKeyHeight       = "height"
+	AttributeKeyRequest      = "request"
 
 	AttributeValueCategory = ModuleName
 	AttributeValueQuery    = "query"

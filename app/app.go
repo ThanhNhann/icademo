@@ -464,13 +464,6 @@ func New(
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
-	app.InterchainqueryKeeper = interchainquerykeeper.NewKeeper(appCodec, keys[interchainquerytypes.StoreKey])
-	interchainQueryModule := interchainquery.NewAppModule(appCodec, app.InterchainqueryKeeper)
-	//Enable ICQ callbacks for Txdemo module
-	app.InterchainqueryKeeper.SetCallbackHandler(txdemomoduletypes.ModuleName, app.TxdemoKeeper.ICQCallbackHandler())
-
-	// ... other modules keepers
-
 	// Create IBC Keeper
 	app.IBCKeeper = ibckeeper.NewKeeper(
 		appCodec, keys[ibcexported.StoreKey],
@@ -513,6 +506,13 @@ func New(
 		app.MsgServiceRouter(),
 	)
 	app.ICAHostKeeper.WithQueryRouter(app.GRPCQueryRouter())
+
+	app.InterchainqueryKeeper = interchainquerykeeper.NewKeeper(appCodec, keys[interchainquerytypes.StoreKey], app.IBCKeeper)
+	interchainQueryModule := interchainquery.NewAppModule(appCodec, app.InterchainqueryKeeper)
+	//Enable ICQ callbacks for Txdemo module
+	app.InterchainqueryKeeper.SetCallbackHandler(txdemomoduletypes.ModuleName, app.TxdemoKeeper.ICQCallbackHandler())
+
+	// ... other modules keepers
 
 	app.TxdemoKeeper = *txdemomodulekeeper.NewKeeper(
 		appCodec,
